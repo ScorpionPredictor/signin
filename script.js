@@ -1,65 +1,34 @@
-const axios = require('axios');
+document.getElementById('login-button').addEventListener('click', function() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-// OAuth link parameters
-const clientId = '1260650408485982290';
-const redirectUri = 'https://scorpionpredictor.github.io/';
-const scope = 'email identify guilds.join guilds.members.read guilds';
-const roleId = '1259983970964209725';
-const guildId = '1259983786352050326';
-
-// Function to exchange code for access token
-async function getAccessToken(code) {
-  const response = await axios.post(`https://discord.com/api/oauth2/token`, {
-    client_id: clientId,
-    client_secret: '5II_1Fv-ez1b-oIii9UcToKWHS2YSc06', // Replace with your client secret
-    grant_type: 'authorization_code',
-    code,
-    redirect_uri: redirectUri,
-  });
-  return response.data.access_token;
-}
-
-res.send('Javascript is ass')
-
-// Function to fetch user's guilds and check for role
-async function checkUserRole(accessToken) {
-  const response = await axios.get(`https://discord.com/api/users/@me/guilds`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  const guilds = response.data;
-  const userGuild = guilds.find((guild) => guild.id === guildId);
-  if (!userGuild) {
-    return false; // User is not in the guild
+  if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
   }
-  const guildMemberResponse = await axios.get(`https://discord.com/api/guilds/${guildId}/members/${userGuild.user.id}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  const guildMember = guildMemberResponse.data;
-  return guildMember.roles.includes(roleId);
-}
 
-// Handle OAuth redirect
-async function handleOAuthRedirect(req, res) {
-  const code = req.query.code;
-  if (!code) {
-    return res.status(401).send('No code provided');
-  }
-  try {
-    const accessToken = await getAccessToken(code);
-    const hasRole = await checkUserRole(accessToken);
-    if (hasRole) {
-      // User has the role, handle accordingly
-      res.send('User has the role!');
-    } else {
-      // User does not have the role, handle accordingly
-      res.send('User does not have the role');
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error handling OAuth redirect');
-  }
-}
+  // Send the email and password to the backend for verification
+  fetch('/api/login', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+  })
+  .then(response => {
+      if (response.ok) {
+          return response.json();
+      } else {
+          throw new Error('Login failed');
+      }
+  })
+  .then(data => {
+      console.log('Login successful:', data);
+      // Redirect or do something with the response
+      window.location.href = 'https://scorpionpredictor.github.io/v1/dashboard/'; // Redirect to a dashboard page
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      alert('Login failed. Please check your credentials.');
+  });
+});
