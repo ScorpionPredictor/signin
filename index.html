@@ -3,32 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Login</title>
+    <title>Sign In</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #111; /* same background color as the other pages */
+            background-color: #111; /* Same background color as the other pages */
+            color: #fff; /* White text color */
         }
         h1 {
-            color: #fff; /* white text color */
+            margin-bottom: 20px;
         }
-        #discord-login {
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+            max-width: 300px; /* Limit the width of the form */
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%; /* Full width */
+        }
+        #login-button {
             background-color: #7289da; /* Discord blue color */
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 10px;
             font-size: 16px;
             cursor: pointer;
         }
-        #discord-login:hover {
+        #login-button:hover {
             background-color: #5a6df5; /* Discord blue hover color */
+        }
+        .redirect {
+            margin-top: 20px;
+        }
+        .redirect a {
+            color: #7289da; /* Link color */
+            text-decoration: none; /* Remove underline */
+        }
+        .redirect a:hover {
+            text-decoration: underline; /* Add underline on hover */
         }
     </style>
 </head>
 <body>
-    <h1>Sign in with Discord</h1>
-    <button id="discord-login">Login with Discord</button>
+    <h1>Sign In</h1>
+    <div class="form-container">
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button id="login-button">Login</button>
+        <div class="redirect">
+            <p>Don't have an account? <a href="/register">Register here</a></p>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
