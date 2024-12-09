@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- coding by @_.codedevotee -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Register form</title>
+
+    <!--Boxicons CDN-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!--Custom CSS-->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <span class="rotate-bg"></span>
+        <span class="rotate-bg2"></span>
+
+        <div class="form-box login">
+            <h2 class="title animation" style="--i:0; --j:21">Login</h2>
+            <form action="https://scorpionpredictor.github.io/v1/dashboard">
+                <div class="input-box animation" style="--i:1; --j:22">
+                    <input type="text" required>
+                    <label for="">Username</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box animation" style="--i:2; --j:23">
+                    <input type="password" required>
+                    <label for="">Password</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <button type="submit" class="btn animation" style="--i:3; --j:24">Login</button>
+                <div class="linkTxt animation" style="--i:5; --j:25">
+                    <p>Don't have an account? <a href="#" class="register-link">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-text login">
+            <h2 class="animation" style="--i:0; --j:20">Welcome Back!</h2>
+            <p class="animation" style="--i:1; --j:21">Want to log into Scorpion?</p>
+        </div>
+
+        <div class="form-box register">
+            <h2 class="title animation" style="--i:17; --j:0">Sign Up</h2>
+            <form id="registerForm">
+                <div class="input-box animation" style="--i:18; --j:1">
+                    <input type="text" id="registerUsername" required>
+                    <label for="">Username</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box animation" style="--i:19; --j:2">
+                    <input type="email" required>
+                    <label for="">Email</label>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+
+                <div class="input-box animation" style="--i:20; --j:3">
+                    <input type="password" id="registerPassword" required>
+                    <label for="">Password</label>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+
+                <button type="button" id="signUpButton" class="btn animation" style="--i:21;--j:4">Sign Up</button>
+
+                <div class="linkTxt animation" style="--i:22; --j:5">
+                    <p>Already have an account? <a href="#" class="login-link">Login</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="info-text register">
+            <h2 class="animation" style="--i:17; --j:0;">Welcome Back!</h2>
+            <p class="animation" style="--i:18; --j:1;">Come join our journey.</p>
+        </div>
+    </div>
+
+    <!--Script.js-->
+    <script>
+        const wrapper = document.querySelector('.wrapper');
+        const registerLink = document.querySelector('.register-link');
+        const loginLink = document.querySelector('.login-link');
+        const signUpButton = document.getElementById('signUpButton');
+        const usernameInput = document.getElementById('registerUsername');
+        const passwordInput = document.getElementById('registerPassword');
+
+        registerLink.addEventListener('click', () => {
+            wrapper.classList.add('active');
+            wrapper.classList.remove('active-login');
+        });
+
+        loginLink.addEventListener('click', () => {
+            wrapper.classList.remove('active');
+            wrapper.classList.add('active-login');
+        });
+
+        signUpButton.addEventListener('click', async () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            const data = {
+                username: username,
+                password: password
+            };
+
+            await saveDataToGitHub(data);
+        });
+
+        // Function to save data to a GitHub repository
+        async function saveDataToGitHub(data) {
+            const url = 'https://api.github.com/repos/ScorpionPredictor/v1/contents/users.json';
+            const token = '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'; // Replace with your actual GitHub token
+
+            try {
+                // Fetch the current file to get the SHA
+                const fileResponse = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3.raw'
+                    }
+                });
+
+                let sha = '';
+                if (fileResponse.ok) {
+                    const fileData = await fileResponse.json();
+                    sha = fileData.sha; // Get the SHA of the existing file
+                } else {
+                    // Log the response status and text for error handling
+                    const errorText = await fileResponse.text(); // Get the response as text
+                    console.error('Error fetching file:', fileResponse.status, fileResponse.statusText, errorText);
+                    return; // Exit if there's an error fetching the file
+                }
+
+                // Prepare the data to be updated
+                const updateResponse = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Updating JSON file',
+                        content: btoa(JSON.stringify(data)), // Encode the JSON data to base64
+                        sha: sha // Include the SHA of the file to update
+                    })
+                });
+
+                if (updateResponse.ok) {
+                    const jsonResponse = await updateResponse.json();
+                    console.log('File updated successfully:', jsonResponse);
+                } else {
+                    // Log the response status and text for error handling
+                    const errorText = await updateResponse.text(); // Get the response as text
+                    console.error('Error updating file:', updateResponse.status, updateResponse.statusText, errorText);
+                }
+
+            } catch (error) {
+                console.error('An unexpected error occurred:', error);
+            }
+        }
+    </script>
+</body>
+</html>
